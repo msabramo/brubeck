@@ -190,8 +190,8 @@ class TestRedisQueryset(unittest.TestCase):
 
 
     def setUp(self):
-        import redis
-        redis_connection = redis.StrictRedis(host='localhost', port=6379, db=0)
+        from fakeredis import FakeRedis
+        redis_connection = FakeRedis()
         redis_connection.flushdb()
         self.queryset = RedisQueryset(db_conn=redis_connection)
 
@@ -202,16 +202,6 @@ class TestRedisQueryset(unittest.TestCase):
 
 
     def test__create_one(self):
-        # TODO: - fix test
-        # Test will fail, unless the value associated with 
-        # 'id': 'foo' is deleted. Normally, during this test an object with id='foo'
-        # exists- test may need to be fixed. If the object "foo" exists
-        # the first operation will return self.queryset.MSG_UPDATED instead
-        # of self.queryset.MSG_FAILED
-        import redis
-        redis_connection = redis.StrictRedis(host='localhost', port=6379, db=0)
-        redis_connection.delete('id')
-        
         shield = TestDoc(id="foo")
         status, return_shield = self.queryset.create_one(shield)
         self.assertEqual(self.queryset.MSG_CREATED, status)
